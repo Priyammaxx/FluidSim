@@ -1,28 +1,18 @@
+# handles only square grid sizes
+# for incompressible fluids : density of fluid is constant
+
 import pygame
 import random
+import noise
 
 from Fluid import *
+from variables import *
 
+fluid = Fluid(DT, DIFFUSION, VISCOSITY)
 
-DENSITY = 0.2
-DIFFUSION = 0
-VISCOSITY = 0
+def draw_window(OBSTACLE):
+    global T
 
-WIDTH, HEIGHT = 512, 512
-
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("FluidSim")
-
-WHITE = (255, 255, 255)
-BLACK = (0,0,0)
-BLUE = (173, 216, 230)
-
-FPS = 24
-
-
-fluid = Fluid(DENSITY, DIFFUSION, VISCOSITY)
-
-def draw_window():
     WIN.fill(BLUE)
 
     cx = int((0.5*WIDTH) / SCALE)
@@ -33,13 +23,17 @@ def draw_window():
             fluid.addDensity(cx + i, cy + j, random.randint(50,150))
 
     for i in range(2):
-        v = pygame.math.Vector2(random.random() * math.pi * 2)
-        fluid.addVelocity(cx, cy, v.x * 0.2, v.y * 0.2)
+        angle = noise.pnoise1(T) * 3.1416 * 2
+        vx = math.cos(angle)
+        vy = math.sin(angle)
+        T += 0.01
+        fluid.addVelocity(cx, cy, vx * 0.2, vy * 0.2)
 
     fluid.step()
     fluid.renderD(WIN) # figure out the correct order
     # fluid.renderV(WIN) # why
-    # fluid.fadeD() # necessary to call all these functions?
+    fluid.fadeD() # necessary to call all these functions?
+    pygame.draw.rect(WIN, BLUE, [OBSTACLE.x, OBSTACLE.y, obs_width, obs_length], 0) # draw obstacle rectangle
     pygame.display.update()
 
 def main():
@@ -51,7 +45,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-        draw_window()
+        draw_window(obstacle)
     pygame.quit()
     
 if __name__ == "__main__":
