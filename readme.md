@@ -1,6 +1,6 @@
 # Requirements :
-pygame
-numpy
+- pygame
+- numpy
 # Code is Broken
 Code is not at all optimised and runs sluggishly. Run the program Fluid_Sim.py and wait for at least a minute to observe anything.
 
